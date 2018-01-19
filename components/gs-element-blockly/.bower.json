@@ -1,0 +1,46 @@
+{
+  "name": "gs-element-blockly",
+  "authors": [
+    "miguelgarcia",
+    "asanzo",
+    "rodri042"
+  ],
+  "description": "Element providing Blockly interface for Gobstones Web",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "gobstones"
+  ],
+  "main": "gs-element-blockly.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/Program-AR/gs-element-blockly",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "blockly-package": "0.0.15",
+    "proceds-blockly": "program-ar/proceds-blockly#^0.1.4"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "ignore": [
+    "demo",
+    "screenshots",
+    "test",
+    ".git*",
+    "gp.sh",
+    "deploy-gh-pages.sh"
+  ],
+  "_release": "1d2e3df3ff",
+  "_resolution": {
+    "type": "branch",
+    "branch": "dev",
+    "commit": "1d2e3df3ffe86a238a75ecc2f32bc11064067a68"
+  },
+  "_source": "git://github.com/Program-AR/gs-element-blockly.git",
+  "_target": "dev",
+  "_originalSource": "Program-AR/gs-element-blockly",
+  "_direct": true
+}

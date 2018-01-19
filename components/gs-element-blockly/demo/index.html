@@ -1,0 +1,156 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>gs-element-blockly Demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="formatXML.js"></script>
+    <link rel="import" href="../gs-element-blockly.html">
+  </head>
+  <body unresolved>
+    <style>
+      .colors-panel {
+        position: absolute;
+        z-index: 999;
+        background-color: rgba(255, 0, 0, 0.5);
+        top: 100px;
+        right: 50px;
+      }
+    </style>
+
+    <p>An example of <code>&lt;gs-element-blockly&gt;</code>:</p>
+    <p>
+      <div class="colors-panel">
+        <strong>Colores:</strong><br>
+        Saturación: <input type="range" min="1" max="100" value="1" class="slider" id="globalHsvSaturation"><br>
+        Valor HSV: <input type="range" min="1" max="100" value="1" class="slider" id="globalHsvValue"><br>
+        Comandos primitivos: <input type="range" min="1" max="359" value="1" class="slider" id="primitiveCommand"><br>
+        Asignación: <input type="range" min="1" max="359" value="1" class="slider" id="assignation"><br>
+        Estructuras de control: <input type="range" min="1" max="359" value="1" class="slider" id="controlStructure"><br>
+        Expresiones literales: <input type="range" min="1" max="359" value="1" class="slider" id="literalExpression"><br>
+        Expresiones primitivas/Operadores: <input type="range" min="1" max="359" value="1" class="slider" id="expression"><br>
+        Programa: <input type="range" min="1" max="359" value="1" class="slider" id="program"><br>
+        Programa interactivo: <input type="range" min="1" max="359" value="1" class="slider" id="interactiveProgram"><br>
+        Asociación interactiva: <input type="range" min="1" max="359" value="1" class="slider" id="interactiveBinding"><br>
+        Procedimientos/Funciones: <input type="range" min="1" max="359" value="1" class="slider" id="procedure"><br>
+        Completar: <input type="range" min="1" max="359" value="1" class="slider" id="complete">
+      </div>
+
+      <hr>
+      <button id="default_toolboxbtn">Default toolbox</button>
+      <button id="limited_toolboxbtn">Limited toolbox</button>
+      <button id="limited_toolboxbtn2">Limited toolbox 2</button>
+      <button id="set_xmlbtn">Set xml</button>
+      <button id="set_primitive_proceduresbtn">Set customblocks</button>
+      <input type="text" id="primitive_procedurestxt" value='["Poner_FloresAl_", "Podar"]'></input><br />
+      <button id="set_primitive_functionsbtn">Set functions</button>
+      <input type="text" id="primitive_functionstxt" value='["hayFlores_en_", "cuantasHay_en_"]'></input>
+      <br/>
+      <button id="modificar_dimensionesbtn">Modificar dimensiones</button>
+      <br/>
+      <button id="highlightbtn">Highlight del siguiente bloque -&gt;</button>
+      <input type="text" id="highlighttxt" value='Id del bloque (ver xml)'></input>
+      <button id="errorbtn">&lt;- Error del bloque anterior</button>
+    </p>
+    <gs-element-blockly media="../../blockly-package/media/">
+    </gs-element-blockly>
+
+    <p>
+      <button id="generatebtn">Generar Código</button>
+      <input id="withRegions" type="checkbox">With region pragmas</input>
+      <input id="shouldFormat" type="checkbox">Should Format XML</input>
+    </p>
+    <textarea id="code" rows="20" cols="80"></textarea>
+    <textarea id="xml" rows="20" cols="80"></textarea>
+
+    <p>IDs válidos para poner en el toolbox:</p>
+    <p>(Entre paréntesis los ids válidos para ese bloque/categoría)</p>
+    <pre id="divValidIds"></pre>
+    <script>
+      var blocklyElement = document.querySelector('gs-element-blockly');
+
+      Object.keys(Blockly.GOBSTONES_COLORS).forEach((k) => {
+        const slider = document.querySelector(`#${k}`);
+        const factor = k.startsWith("global") ? 100 : 1;
+
+        slider.value = Blockly.GOBSTONES_COLORS[k] * factor;
+
+        slider.addEventListener("change", () => {
+          const newColors = Object.assign(Blockly.GOBSTONES_COLORS, {
+            [k]: slider.value / factor
+          });
+
+          console.info("NEW COLORS", newColors);
+          blocklyElement.testColors(newColors);
+        });
+      });
+
+      document.querySelector('#generatebtn').addEventListener('click', function() {
+        document.getElementById("code").innerHTML = blocklyElement.generateCode({withRegions: document.getElementById("withRegions").checked});
+        document.getElementById("xml").innerHTML = document.getElementById("shouldFormat").checked ? formatXml(blocklyElement.get('workspaceXml')) : blocklyElement.get('workspaceXml');
+      });
+
+      document.querySelector('#default_toolboxbtn').addEventListener('click', function() {
+        blocklyElement.set('toolbox', "");
+      });
+
+      document.querySelector('#limited_toolboxbtn').addEventListener('click', function() {
+        blocklyElement.set('toolbox', '{ "visible": ["Poner","OperadorNumerico", "CategoriaAsignacion", "DefinicionesDeFunciones","ProcedimientosPrimitivos"], "disabled": ["Literales"]}');
+      });
+
+      document.querySelector('#limited_toolboxbtn2').addEventListener('click', function() {
+        blocklyElement.set('toolbox', '{ "visible": ["Poner","OperadorDeComparacion", "Procedimientos","Funciones","FuncionesPrimitivas"], "disabled": ["Sacar"]}');
+      });
+
+      document.querySelector('#set_primitive_proceduresbtn').addEventListener('click', function() {
+        blocklyElement.set('primitiveProcedures', document.getElementById("primitive_procedurestxt").value);
+      });
+
+      document.querySelector('#set_primitive_functionsbtn').addEventListener('click', function() {
+        blocklyElement.set('primitiveFunctions', document.getElementById("primitive_functionstxt").value);
+      });
+
+      document.querySelector('#highlightbtn').addEventListener('click', function() {
+        blocklyElement.highlightBlock(document.getElementById("highlighttxt").value);
+      });
+      document.querySelector('#errorbtn').addEventListener('click', function() {
+        blocklyElement.showBlockError(document.getElementById("highlighttxt").value);
+      });
+
+      document.querySelector('#set_xmlbtn').addEventListener('click', function() {
+        blocklyElement.set('workspaceXml',prompt("Paste xml here:", ""));
+      });
+
+      document.querySelector('#modificar_dimensionesbtn').addEventListener('click', function() {
+        blocklyElement.set('width', 300 + Math.random() * 500);
+        blocklyElement.set('height', 200 + Math.random() * 500);
+      });
+
+      window.addEventListener('WebComponentsReady', function(e) {
+
+        function printObject(o){
+          if(o.blockXMLID){ //es bloque
+            return o.blockXMLID + '(' + o.blockAliases + ')';
+          } else {
+            return '\n\t' + o.categoryName + '(' + o.categoryAliases + '):\n\t\t' + o.categoryContents.map(printObject);
+          }
+        }
+        document.querySelector('#divValidIds').innerHTML = blocklyElement.validToolboxIDs().map(printObject);
+        
+        //document.getElementById("highlighttxt").innerHTML = blocklyElement.get('workspaceXml').match(/id=".*"/).slice(4,24);
+      });
+
+    </script>
+
+  </body>
+</html>
